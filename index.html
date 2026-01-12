@@ -3,52 +3,94 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <!-- Prevent caching -->
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
   <title>Enter Password</title>
+
   <style>
     body{
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-  display:grid;
-  place-items:center;
-  height:100vh;
-  margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      display:grid;
+      place-items:center;
+      height:100vh;
+      margin:0;
+      background:
+        linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.35)),
+        url("cosmos.jpeg") center / cover no-repeat fixed;
+    }
 
-  background:
-    linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.35)),
-    url("cosmos.jpeg") center / cover no-repeat fixed;
+    .card{
+      background:rgba(255,255,255,.96);
+      padding:24px;
+      border-radius:14px;
+      box-shadow:0 10px 30px rgba(0,0,0,.25);
+      width:min(420px,92vw)
+    }
 
-}
-    .card{background:#fff;padding:24px;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.08);width:min(420px,92vw)}
-    h1{font-size:18px;margin:0 0 12px}
-    inputinput{
-  width:100%;
-  padding:12px 14px;
-  border:1px solid #d7dbe7;
-  border-radius:10px;
-  font-size:16px;
-  box-sizing:border-box;
-  height:44px;
-  line-height:44px;
-  outline:none;
-  background:#fff;
-  -webkit-appearance:none;
-  appearance:none;
-}
-    button{margin-top:12px;width:100%;padding:12px 14px;border:0;border-radius:10px;font-size:16px;cursor:pointer}
-    .hint{margin-top:10px;font-size:13px;opacity:.7}
-    .err{margin-top:10px;font-size:13px;color:#b00020;display:none}
+    h1{
+      font-size:18px;
+      margin:0 0 12px
+    }
+
+    input{
+      width:100%;
+      padding:12px 14px;
+      border:1px solid #d7dbe7;
+      border-radius:10px;
+      font-size:16px;
+      box-sizing:border-box;
+      height:44px;
+      line-height:44px;
+      outline:none;
+      background:#fff;
+      -webkit-appearance:none;
+      appearance:none;
+    }
+
+    button{
+      margin-top:12px;
+      width:100%;
+      padding:12px 14px;
+      border:0;
+      border-radius:10px;
+      font-size:16px;
+      cursor:pointer
+    }
+
+    .err{
+      margin-top:10px;
+      font-size:13px;
+      color:#b00020;
+      display:none
+    }
   </style>
 </head>
+
 <body>
   <div class="card">
     <h1>Protected access to Carey's Bar Ltd</h1>
-    <input id="pw" type="password" placeholder="Password" autocomplete="current-password" />
+
+    <input
+      id="pw"
+      type="password"
+      placeholder="Password"
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="off"
+      spellcheck="false"
+    />
+
     <button id="go" type="button">Continue</button>
+
     <div id="err" class="err">Incorrect password.</div>
-    
   </div>
 
   <script>
-    // CHANGE THESE:
+    // CONFIG
     const PASSWORD = "bcjd";
     const DESTINATION = "https://sites.google.com/view/careys-bar-ltd/home";
 
@@ -57,16 +99,28 @@
 
     function proceed() {
       err.style.display = "none";
+
       if (pw.value === PASSWORD) {
+        pw.value = ""; // clear immediately
         window.location.href = DESTINATION;
       } else {
+        pw.value = ""; // clear on failure
         err.style.display = "block";
-        pw.select();
       }
     }
 
     document.getElementById("go").addEventListener("click", proceed);
-    pw.addEventListener("keydown", (e) => { if (e.key === "Enter") proceed(); });
+
+    pw.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") proceed();
+    });
+
+    // Clear password if page is restored from back/forward cache
+    window.addEventListener("pageshow", function (event) {
+      if (event.persisted) {
+        pw.value = "";
+      }
+    });
   </script>
 </body>
 </html>
