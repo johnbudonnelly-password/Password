@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
 
-  <!-- Discourage caching -->
+  <!-- Discourage caching of the page -->
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -74,13 +74,13 @@
   <div class="card">
     <h1>Protected access to Carey's Bar Ltd</h1>
 
-    <!-- Password-manager suppression (best-effort) -->
+    <!-- Password-manager suppression + anti-autofill (best-effort) -->
     <input
       id="pw"
       type="password"
       name="gateway-access"
       placeholder="Password"
-      autocomplete="off"
+      autocomplete="new-password"
       autocorrect="off"
       autocapitalize="off"
       spellcheck="false"
@@ -102,14 +102,39 @@
     const pw = document.getElementById("pw");
     const err = document.getElementById("err");
 
+    // --- Never allow a cached/autofilled value to remain in the field ---
+    function clearPasswordField() {
+      // Clear immediately
+      pw.value = "";
+      // Clear again shortly after (covers delayed autofill in some browsers)
+      setTimeout(() => { pw.value = ""; }, 50);
+      setTimeout(() => { pw.value = ""; }, 250);
+      setTimeout(() => { pw.value = ""; }, 1000);
+    }
+
+    // Clear on initial load
+    clearPasswordField();
+
+    // Clear when page is shown (including back/forward cache restores)
+    window.addEventListener("pageshow", () => clearPasswordField());
+
+    // Clear when the tab regains focus (some browsers autofill on focus)
+    window.addEventListener("focus", () => clearPasswordField());
+
+    // If a browser/extension injects a value after DOM load, wipe it
+    const observer = new MutationObserver(() => {
+      if (pw.value) clearPasswordField();
+    });
+    observer.observe(pw, { attributes: true, attributeFilter: ["value"] });
+
     function proceed() {
       err.style.display = "none";
 
       if (pw.value === PASSWORD) {
-        pw.value = ""; // clear immediately
+        clearPasswordField(); // clear immediately on success
         window.location.href = DESTINATION;
       } else {
-        pw.value = ""; // clear on failure
+        clearPasswordField(); // clear immediately on failure
         err.style.display = "block";
       }
     }
@@ -118,11 +143,6 @@
 
     pw.addEventListener("keydown", (e) => {
       if (e.key === "Enter") proceed();
-    });
-
-    // Clear password if page is restored from back/forward cache
-    window.addEventListener("pageshow", (event) => {
-      if (event.persisted) pw.value = "";
     });
   </script>
 </body>
