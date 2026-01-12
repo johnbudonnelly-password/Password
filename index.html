@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Enter Password</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;display:grid;place-items:center;height:100vh;margin:0;background:#f6f7fb}
+    .card{background:#fff;padding:24px;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.08);width:min(420px,92vw)}
+    h1{font-size:18px;margin:0 0 12px}
+    input{width:100%;padding:12px 14px;border:1px solid #d7dbe7;border-radius:10px;font-size:16px}
+    button{margin-top:12px;width:100%;padding:12px 14px;border:0;border-radius:10px;font-size:16px;cursor:pointer}
+    .hint{margin-top:10px;font-size:13px;opacity:.7}
+    .err{margin-top:10px;font-size:13px;color:#b00020;display:none}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Protected access</h1>
+    <input id="pw" type="password" placeholder="Password" autocomplete="current-password" />
+    <button id="go" type="button">Continue</button>
+    <div id="err" class="err">Incorrect password.</div>
+    <div class="hint">This is a light deterrent, not true security.</div>
+  </div>
+
+  <script>
+    // CHANGE THESE:
+    const PASSWORD = "ChangeMe123!";
+    const DESTINATION = "https://sites.google.com/view/your-site";
+
+    const pw = document.getElementById("pw");
+    const err = document.getElementById("err");
+
+    function proceed() {
+      err.style.display = "none";
+      if (pw.value === PASSWORD) {
+        window.location.href = DESTINATION;
+      } else {
+        err.style.display = "block";
+        pw.select();
+      }
+    }
+
+    document.getElementById("go").addEventListener("click", proceed);
+    pw.addEventListener("keydown", (e) => { if (e.key === "Enter") proceed(); });
+  </script>
+</body>
+</html>
